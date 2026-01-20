@@ -274,6 +274,366 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Page Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      10%, 30% { transform: scale(0.9); }
+      20%, 40% { transform: scale(1.1); }
+    }
+
+    .animate-fadeIn { animation: fadeIn 1s ease-in; }
+    .animate-slideInRight { animation: slideInRight 0.8s ease-out; }
+    .animate-bounce { animation: bounce 2s infinite; }
+    .animate-pulse { animation: pulse 2s infinite; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-zoomIn { animation: zoomIn 0.8s ease-out; }
+    .animate-heartBeat { animation: heartBeat 1.5s infinite; }
+
+    /* Interactive Elements */
+    .tap-reveal {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 3px dashed rgba(255,255,255,0.5);
+    }
+
+    .tap-reveal:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .tap-reveal.revealed {
+      background: var(--success);
+      border-style: solid;
+      animation: heartBeat 1s;
+    }
+
+    /* Audio Player */
+    .audio-controls {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .audio-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .audio-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .audio-btn.playing {
+      background: var(--success);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      z-index: 99;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      transition: width 0.3s;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    }
+
+    /* Bookmark */
+    .bookmark-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      opacity: 0.6;
+    }
+
+    .bookmark-btn:hover {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+
+    .bookmark-btn.bookmarked {
+      opacity: 1;
+      animation: bounce 0.5s;
+    }
+
+    /* Reading Stats */
+    .reading-stats {
+      text-align: center;
+      padding: 1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .reading-stats strong {
+      color: white;
+    }
+
+    /* Quiz Modal */
+    .quiz-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .quiz-modal.active {
+      display: flex;
+    }
+
+    .quiz-content {
+      background: white;
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      color: var(--text);
+    }
+
+    .quiz-content h2 {
+      color: var(--primary);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .quiz-question {
+      margin-bottom: 2rem;
+    }
+
+    .quiz-question h3 {
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .quiz-option {
+      background: var(--bg);
+      color: white;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .quiz-option:hover {
+      background: var(--primary);
+      transform: translateX(10px);
+    }
+
+    .quiz-option.selected {
+      background: var(--primary);
+    }
+
+    .quiz-option.correct {
+      background: var(--success);
+    }
+
+    .quiz-option.incorrect {
+      background: var(--danger);
+    }
+
+    .quiz-submit {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      width: 100%;
+      margin-top: 1rem;
+      transition: all 0.3s;
+    }
+
+    .quiz-submit:hover {
+      background: var(--primary-dark);
+    }
+
+    .quiz-result {
+      text-align: center;
+      padding: 2rem;
+      margin-top: 2rem;
+      background: var(--bg);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .quiz-score {
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--success);
+      margin: 1rem 0;
+    }
+
+    /* Certificate Modal */
+    .certificate-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .certificate-modal.active {
+      display: flex;
+    }
+
+    .certificate {
+      background: white;
+      padding: 3rem;
+      border-radius: 16px;
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      border: 10px solid var(--primary);
+      position: relative;
+    }
+
+    .certificate-header {
+      color: var(--primary);
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+
+    .certificate-title {
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+
+    .certificate-name {
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin: 2rem 0;
+      text-decoration: underline;
+      text-decoration-style: double;
+    }
+
+    .certificate-text {
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .certificate-badge {
+      font-size: 4rem;
+      margin: 2rem 0;
+    }
+
+    .certificate-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .cert-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .cert-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
       #flipbook {
@@ -415,9 +775,20 @@
 
   <!-- Flipbook Container -->
   <div class="flipbook-container" id="flipbookContainer">
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+
     <div class="book-title">
       <h1 id="bookTitle">The Rainbow Dragon</h1>
       <p id="bookAuthor">A Magical Adventure Story</p>
+    </div>
+
+    <!-- Reading Stats -->
+    <div class="reading-stats">
+      <span>📖 Estimated reading time: <strong id="readingTime">15 minutes</strong></span>
+      <span style="margin-left: 2rem;">⏱️ Time spent: <strong id="timeSpent">0:00</strong></span>
     </div>
 
     <div class="flipbook-wrapper">
@@ -439,6 +810,38 @@
     </div>
   </div>
 
+  <!-- Quiz Modal -->
+  <div class="quiz-modal" id="quizModal">
+    <div class="quiz-content">
+      <h2>📝 Story Quiz</h2>
+      <div id="quizQuestions"></div>
+      <button class="quiz-submit" id="submitQuiz" onclick="submitQuiz()">Submit Quiz</button>
+      <div id="quizResult" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Certificate Modal -->
+  <div class="certificate-modal" id="certificateModal">
+    <div class="certificate">
+      <div class="certificate-header">🏆 Certificate of Completion 🏆</div>
+      <div class="certificate-title">This certifies that</div>
+      <div class="certificate-name" id="certificateName">Student Name</div>
+      <div class="certificate-text">
+        has successfully completed reading<br>
+        <strong id="certificateBook">The Rainbow Dragon</strong><br>
+        and passed the comprehension quiz with flying colors!
+      </div>
+      <div class="certificate-badge">🌟✨🎉</div>
+      <div style="color: var(--text-light); font-size: 0.9rem;">
+        Date: <span id="certificateDate"></span>
+      </div>
+      <div class="certificate-actions">
+        <button class="cert-btn" onclick="downloadCertificate()">📥 Download</button>
+        <button class="cert-btn" onclick="closeCertificate()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const CLIENT_ID = "656751987892-s5h4b3h7aq6rl63ut7pl6hgm3d2vr46p.apps.googleusercontent.com";
     const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"; // Replace with your deployed script URL
@@ -450,57 +853,114 @@
 
     let currentUser = null;
     let flipbookInitialized = false;
+    let currentAudio = null;
+    let startTime = null;
+    let readingTimer = null;
+    let bookmarks = [];
+    let userAnswers = [];
 
     // Sample book data (in production, this would come from your backend)
     const books = {
       'rainbow-dragon': {
         title: 'The Rainbow Dragon',
         author: 'A Magical Adventure Story',
+        estimatedReadTime: 15, // minutes
+        quiz: {
+          questions: [
+            {
+              question: "What did Luna find in her garden?",
+              options: ["A flower", "A mysterious egg", "A treasure", "A book"],
+              correct: 1
+            },
+            {
+              question: "What was special about the dragon?",
+              options: ["It was invisible", "It had rainbow scales", "It could talk", "It was tiny"],
+              correct: 1
+            },
+            {
+              question: "What did Rainbow teach Luna?",
+              options: ["How to fly", "Each color has special magic", "How to draw", "Math skills"],
+              correct: 1
+            }
+          ]
+        },
         pages: [
           {
             type: 'cover',
             title: 'The Rainbow Dragon',
-            subtitle: 'By Kids O\'Day'
+            subtitle: 'By Kids O\'Day',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' // Sample audio
           },
           {
             image: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=400&h=300&fit=crop',
             title: 'Chapter 1: A Colorful Discovery',
-            text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.'
+            text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            animations: ['fadeIn', 'bounce'],
+            interactive: {
+              type: 'tap-reveal',
+              hidden: '🥚 Tap the egg to see it shimmer!',
+              revealed: '✨ The egg glows with rainbow colors! ✨'
+            }
           },
           {
             image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
             title: 'Chapter 2: The Hatching',
-            text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!'
+            text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+            animations: ['slideInRight'],
+            interactive: {
+              type: 'tap-reveal',
+              hidden: '🥚 Tap to see the dragon hatch!',
+              revealed: '🐉 A beautiful rainbow dragon appears!'
+            }
           },
           {
             image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=300&fit=crop',
             title: 'Chapter 3: Learning to Fly',
-            text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.'
+            text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+            animations: ['float']
           },
           {
             image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=300&fit=crop',
             title: 'Chapter 4: The Color Magic',
-            text: 'Rainbow taught Luna that each color has its own special magic and meaning.'
+            text: 'Rainbow taught Luna that each color has its own special magic and meaning.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+            animations: ['pulse'],
+            interactive: {
+              type: 'tap-reveal',
+              hidden: '🌈 Tap to discover the color magic!',
+              revealed: '✨ Red=Love, Blue=Peace, Yellow=Joy! ✨'
+            }
           },
           {
             image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
             title: 'Chapter 5: The Adventure',
-            text: 'They soared over mountains and seas, spreading colorful joy wherever they went.'
+            text: 'They soared over mountains and seas, spreading colorful joy wherever they went.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+            animations: ['zoomIn']
           },
           {
             image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=300&fit=crop',
             title: 'Chapter 6: The Lesson',
-            text: 'Rainbow showed Luna that being different makes the world more beautiful.'
+            text: 'Rainbow showed Luna that being different makes the world more beautiful.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+            animations: ['fadeIn']
           },
           {
             image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop',
             title: 'Chapter 7: Forever Friends',
-            text: 'Luna and Rainbow became the best of friends, proving that friendship knows no bounds.'
+            text: 'Luna and Rainbow became the best of friends, proving that friendship knows no bounds.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+            animations: ['heartBeat']
           },
           {
             image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop',
             title: 'The End',
-            text: 'And they lived happily ever after, sharing their colorful adventures with everyone.'
+            text: 'And they lived happily ever after, sharing their colorful adventures with everyone.',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
+            animations: ['fadeIn']
           },
           {
             type: 'back-cover',
@@ -732,6 +1192,351 @@
         previousPage();
       }
     });
+
+    /* ================= ENHANCED FEATURES ================= */
+    
+    // Audio Narration
+    function playAudio(audioUrl) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      
+      if (audioUrl) {
+        currentAudio = new Audio(audioUrl);
+        currentAudio.play();
+      }
+    }
+
+    function stopAudio() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+    }
+
+    //Progress Tracking
+    function updateProgress(page) {
+      const book = books[bookId];
+      const progress = (page / book.pages.length) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      
+      // Check if reached end
+      if (page === book.pages.length && !book.quizCompleted) {
+        // Show quiz after finishing the book
+        setTimeout(() => {
+          showQuiz();
+        }, 1000);
+      }
+    }
+
+    // Reading Time Tracker
+    function startReadingTimer() {
+      startTime = Date.now();
+      readingTimer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('timeSpent').textContent = 
+          `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function stopReadingTimer() {
+      if (readingTimer) {
+        clearInterval(readingTimer);
+      }
+    }
+
+    // Bookmarks
+    function toggleBookmark(page) {
+      const index = bookmarks.indexOf(page);
+      if (index > -1) {
+        bookmarks.splice(index, 1);
+      } else {
+        bookmarks.push(page);
+      }
+      saveBookmarks();
+    }
+
+    function saveBookmarks() {
+      localStorage.setItem(`bookmarks_${bookId}`, JSON.stringify(bookmarks));
+    }
+
+    function loadBookmarks() {
+      const saved = localStorage.getItem(`bookmarks_${bookId}`);
+      if (saved) {
+        bookmarks = JSON.parse(saved);
+      }
+    }
+
+    // Quiz System
+    function showQuiz() {
+      const book = books[bookId];
+      if (!book.quiz) return;
+      
+      const quizContainer = document.getElementById('quizQuestions');
+      quizContainer.innerHTML = '';
+      userAnswers = [];
+      
+      book.quiz.questions.forEach((q, qIndex) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'quiz-question';
+        questionDiv.innerHTML = `
+          <h3>${qIndex + 1}. ${q.question}</h3>
+          ${q.options.map((option, oIndex) => `
+            <div class="quiz-option" data-question="${qIndex}" data-option="${oIndex}">
+              ${option}
+            </div>
+          `).join('')}
+        `;
+        quizContainer.appendChild(questionDiv);
+      });
+      
+      // Add click handlers
+      document.querySelectorAll('.quiz-option').forEach(option => {
+        option.addEventListener('click', function() {
+          const question = parseInt(this.dataset.question);
+          const optionIndex = parseInt(this.dataset.option);
+          
+          // Remove previous selection
+          document.querySelectorAll(`[data-question="${question}"]`).forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          
+          // Mark as selected
+          this.classList.add('selected');
+          userAnswers[question] = optionIndex;
+        });
+      });
+      
+      document.getElementById('quizModal').classList.add('active');
+      document.getElementById('quizResult').style.display = 'none';
+    }
+
+    function submitQuiz() {
+      const book = books[bookId];
+      if (!book.quiz) return;
+      
+      let correct = 0;
+      book.quiz.questions.forEach((q, index) => {
+        if (userAnswers[index] === q.correct) {
+          correct++;
+          document.querySelectorAll(`[data-question="${index}"]`)[userAnswers[index]].classList.add('correct');
+        } else {
+          if (userAnswers[index] !== undefined) {
+            document.querySelectorAll(`[data-question="${index}"]`)[userAnswers[index]].classList.add('incorrect');
+          }
+          document.querySelectorAll(`[data-question="${index}"]`)[q.correct].classList.add('correct');
+        }
+      });
+      
+      const percentage = Math.round((correct / book.quiz.questions.length) * 100);
+      const passed = percentage >= 70;
+      
+      const resultDiv = document.getElementById('quizResult');
+      resultDiv.innerHTML = `
+        <div class="quiz-score">${percentage}%</div>
+        <h3>${passed ? '🎉 Congratulations!' : '📚 Keep Learning!'}</h3>
+        <p>You got ${correct} out of ${book.quiz.questions.length} questions correct!</p>
+        ${passed ? '<button class="quiz-submit" onclick="showCertificate()">Get Your Certificate! 🏆</button>' : 
+                    '<button class="quiz-submit" onclick="closeQuiz(); setTimeout(showQuiz, 500);">Try Again</button>'}
+      `;
+      resultDiv.style.display = 'block';
+      
+      if (passed) {
+        book.quizCompleted = true;
+        saveProgress(bookId, percentage);
+      }
+    }
+
+    function closeQuiz() {
+      document.getElementById('quizModal').classList.remove('active');
+    }
+
+    // Certificate
+    function showCertificate() {
+      closeQuiz();
+      const book = books[bookId];
+      const userName = currentUser ? `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.email : 'Student';
+      
+      document.getElementById('certificateName').textContent = userName;
+      document.getElementById('certificateBook').textContent = book.title;
+      document.getElementById('certificateDate').textContent = new Date().toLocaleDateString();
+      
+      document.getElementById('certificateModal').classList.add('active');
+      
+      // Save certificate data
+      saveCertificate(bookId, userName);
+    }
+
+    function closeCertificate() {
+      document.getElementById('certificateModal').classList.remove('active');
+    }
+
+    function downloadCertificate() {
+      // In a real implementation, you would use html2canvas or similar to generate an image/PDF
+      alert('Certificate download feature coming soon! For now, take a screenshot of your certificate.');
+    }
+
+    // Save Progress
+    function saveProgress(bookId, quizScore) {
+      const progress = {
+        bookId: bookId,
+        completed: true,
+        quizScore: quizScore,
+        completedDate: new Date().toISOString(),
+        timeSpent: document.getElementById('timeSpent').textContent
+      };
+      
+      localStorage.setItem(`progress_${bookId}`, JSON.stringify(progress));
+      
+      // Optionally send to Google Sheets
+      if (currentUser) {
+        sendProgressToSheet(progress);
+      }
+    }
+
+    function saveCertificate(bookId, userName) {
+      const certificate = {
+        bookId: bookId,
+        userName: userName,
+        email: currentUser ? currentUser.email : '',
+        issuedDate: new Date().toISOString()
+      };
+      
+      localStorage.setItem(`certificate_${bookId}`, JSON.stringify(certificate));
+      
+      // Send to Google Sheets
+      if (currentUser) {
+        sendCertificateToSheet(certificate);
+      }
+    }
+
+    function sendProgressToSheet(progress) {
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'saveProgress',
+          email: currentUser.email,
+          ...progress
+        })
+      }).catch(err => console.error('Error saving progress:', err));
+    }
+
+    function sendCertificateToSheet(certificate) {
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'saveCertificate',
+          ...certificate
+        })
+      }).catch(err => console.error('Error saving certificate:', err));
+    }
+
+    // Update initializeFlipbook to include enhancements
+    const originalInitializeFlipbook = initializeFlipbook;
+    initializeFlipbook = function() {
+      const book = books[bookId];
+      if (!book) {
+        alert('Book not found!');
+        return;
+      }
+
+      // Update book info
+      document.getElementById('bookTitle').textContent = book.title;
+      document.getElementById('bookAuthor').textContent = book.author;
+      document.getElementById('totalPages').textContent = book.pages.length;
+      document.getElementById('readingTime').textContent = (book.estimatedReadTime || 15) + ' minutes';
+
+      // Load bookmarks
+      loadBookmarks();
+
+      // Start reading timer
+      startReadingTimer();
+
+      // Create pages with enhancements
+      const flipbook = $('#flipbook');
+      flipbook.empty();
+
+      book.pages.forEach((page, index) => {
+        let pageContent = '';
+        
+        if (page.type === 'cover') {
+          pageContent = `
+            <div class="page cover">
+              <h1>${page.title}</h1>
+              <p>${page.subtitle}</p>
+              ${page.audio ? `
+                <div class="audio-controls">
+                  <button class="audio-btn" onclick="playAudio('${page.audio}')">🔊</button>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        } else if (page.type === 'back-cover') {
+          pageContent = `
+            <div class="page back-cover">
+              <h1>${page.title}</h1>
+              <p>${page.subtitle}</p>
+            </div>
+          `;
+        } else {
+          const animationClass = page.animations ? page.animations.map(a => `animate-${a}`).join(' ') : '';
+          pageContent = `
+            <div class="page">
+              <button class="bookmark-btn ${bookmarks.includes(index + 1) ? 'bookmarked' : ''}" 
+                      onclick="toggleBookmark(${index + 1}); this.classList.toggle('bookmarked');">
+                ${bookmarks.includes(index + 1) ? '🔖' : '📌'}
+              </button>
+              ${page.image ? `<img src="${page.image}" alt="${page.title}" class="${animationClass}">` : ''}
+              <h2>${page.title}</h2>
+              <p>${page.text}</p>
+              ${page.interactive ? `
+                <div class="tap-reveal" onclick="this.classList.toggle('revealed'); 
+                     this.textContent = this.classList.contains('revealed') ? '${page.interactive.revealed}' : '${page.interactive.hidden}';">
+                  ${page.interactive.hidden}
+                </div>
+              ` : ''}
+              ${page.audio ? `
+                <div class="audio-controls">
+                  <button class="audio-btn" onclick="playAudio('${page.audio}'); this.classList.add('playing');">▶️</button>
+                  <button class="audio-btn" onclick="stopAudio(); document.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('playing'));">⏹️</button>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        flipbook.append(pageContent);
+      });
+
+      // Initialize Turn.js
+      flipbook.turn({
+        width: 900,
+        height: 600,
+        autoCenter: true,
+        duration: 1000,
+        gradients: true,
+        acceleration: true,
+        elevation: 50
+      });
+
+      // Update page indicator and progress on turn
+      flipbook.bind('turned', function(event, page, view) {
+        updatePageIndicator(page);
+        updateProgress(page);
+        stopAudio(); // Stop audio when turning page
+      });
+
+      flipbookInitialized = true;
+      updatePageIndicator(1);
+      updateProgress(1);
+    };
   </script>
 </body>
 </html>
