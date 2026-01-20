@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storybook Reader | Kids O'Day</title>
+  
+  <!-- Google Authentication -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- Turn.js Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(to bottom, #34495e 0%, #2c3e50 100%);
+      color: white;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .user-email {
+      color: #ecf0f1;
+      font-size: 0.9rem;
+    }
+
+    .logout-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: white;
+      padding: 3rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .login-card h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .login-card p {
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+
+    /* Book Container */
+    .book-container {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      perspective: 3000px;
+      position: relative;
+    }
+
+    .book-wrapper {
+      position: relative;
+      margin: 3rem auto;
+    }
+
+    /* The actual 3D book */
+    .magazine-viewport {
+      width: 1000px;
+      height: 650px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .magazine {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Hard shadow for 3D effect */
+    .magazine-viewport .shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.5),
+        0 20px 80px rgba(0, 0, 0, 0.6),
+        0 40px 120px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Page styling */
+    .page {
+      width: 500px;
+      height: 650px;
+      background: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hard cover */
+    .hard {
+      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f59e0b 100%) !important;
+      box-shadow: 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(139, 92, 246, 0.4);
+    }
+
+    .hard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 100%);
+      animation: glossShine 6s ease-in-out infinite;
+    }
+
+    @keyframes glossShine {
+      0%, 100% { opacity: 0.3; transform: translateX(-100%) skewX(-15deg); }
+      50% { opacity: 0.8; transform: translateX(100%) skewX(-15deg); }
+    }
+
+    /* Cover content */
+    .cover-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      z-index: 2;
+    }
+
+    .cover-content h1 {
+      font-size: 3.5rem;
+      color: white;
+      text-align: center;
+      text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.5),
+        0 4px 20px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .cover-content p {
+      font-size: 1.6rem;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      font-style: italic;
+    }
+
+    .cover-icon {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Inner pages */
+    .page-content {
+      padding: 3rem;
+      height: 100%;
+      background: linear-gradient(to right, #fdfcfb 0%, #faf9f7 50%, #f8f7f5 100%);
+      position: relative;
+    }
+
+    /* Page with image */
+    .page-with-image {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .page-with-image img {
+      max-width: 90%;
+      max-height: 350px;
+      border-radius: 12px;
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      border: 5px solid white;
+    }
+
+    .page-with-image h2 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .page-with-image p {
+      font-size: 1.3rem;
+      color: #34495e;
+      line-height: 1.8;
+      max-width: 90%;
+    }
+
+    /* Page number */
+    .page-number {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 1rem;
+      color: #95a5a6;
+      font-style: italic;
+    }
+
+    .page-number.left {
+      left: 3rem;
+    }
+
+    .page-number.right {
+      right: 3rem;
+    }
+
+    /* Controls */
+    .controls {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .control-btn {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .control-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    }
+
+    .control-btn:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .page-info {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-width: 150px;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .magazine-viewport {
+        width: 800px;
+        height: 520px;
+      }
+
+      .page {
+        width: 400px;
+        height: 520px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .magazine-viewport {
+        width: 600px;
+        height: 390px;
+      }
+
+      .page {
+        width: 300px;
+        height: 390px;
+      }
+
+      .cover-content h1 {
+        font-size: 2rem;
+      }
+
+      .page-with-image h2 {
+        font-size: 1.5rem;
+      }
+
+      .page-with-image p {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header" id="header" style="display:none;">
+    <div class="logo">📚 Kids O'Day Storybook</div>
+    <div>
+      <span class="user-email" id="userEmail"></span>
+      <button class="logout-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <h1>📚 Storybook Reader</h1>
+      <p>Sign in to access your magical stories</p>
+      <div id="login"></div>
+      <div id="status" style="margin-top: 1rem; color: #7f8c8d;">Please sign in to continue</div>
+    </div>
+  </div>
+
+  <!-- Book Container -->
+  <div class="book-container" id="bookContainer">
+    <div class="book-wrapper">
+      <div class="magazine-viewport">
+        <div class="shadow"></div>
+        <div class="magazine" id="magazine">
+          <!-- Pages will be added by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="control-btn" id="prevBtn" onclick="previousPage()">
+        ◀ Previous
+      </button>
+      <div class="page-info">
+        Page <span id="currentPage">1</span> of <span id="totalPages">10</span>
+      </div>
+      <button class="control-btn" id="nextBtn" onclick="nextPage()">
+        Next ▶
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const CLIENT_ID = "656751987892-s5h4b3h7aq6rl63ut7pl6hgm3d2vr46p.apps.googleusercontent.com";
+    const SESSION_DAYS = 30;
+
+    // Sample book
+    const book = {
+      title: 'The Rainbow Dragon',
+      pages: [
+        {
+          image: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=800&h=600&fit=crop',
+          title: 'Chapter 1: A Colorful Discovery',
+          text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
+          title: 'Chapter 2: The Hatching',
+          text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop',
+          title: 'Chapter 3: Learning to Fly',
+          text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
+          title: 'Chapter 4: The Color Magic',
+          text: 'Rainbow taught Luna that each color has its own special magic and meaning.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+          title: 'Chapter 5: The Adventure',
+          text: 'They soared over mountains and seas, spreading colorful joy wherever they went.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop',
+          title: 'Chapter 6: The Lesson',
+          text: 'Rainbow showed Luna that being different makes the world more beautiful.'
+        }
+      ]
+    };
+
+    let currentUser = null;
+
+    function saveSession(email) {
+      localStorage.setItem("kidsoday_flipbook_email", email);
+      localStorage.setItem("kidsoday_flipbook_until", Date.now() + SESSION_DAYS * 86400000);
+    }
+
+    function getSession() {
+      const e = localStorage.getItem("kidsoday_flipbook_email");
+      const u = localStorage.getItem("kidsoday_flipbook_until");
+      return (e && u && Date.now() < +u) ? e : null;
+    }
+
+    function signOut() {
+      localStorage.clear();
+      location.reload();
+    }
+
+    function initializeBook() {
+      const magazine = $('#magazine');
+      
+      // Front cover
+      magazine.append(`
+        <div class="hard">
+          <div class="cover-content">
+            <div class="cover-icon">🐉</div>
+            <h1>${book.title}</h1>
+            <p>A Magical Adventure</p>
+          </div>
+        </div>
+      `);
+
+      // Add story pages
+      book.pages.forEach((page, index) => {
+        const pageNum = index + 2;
+        const isLeft = pageNum % 2 === 0;
+        
+        magazine.append(`
+          <div class="page">
+            <div class="page-content page-with-image">
+              <img src="${page.image}" alt="${page.title}">
+              <h2>${page.title}</h2>
+              <p>${page.text}</p>
+              <div class="page-number ${isLeft ? 'left' : 'right'}">${pageNum}</div>
+            </div>
+          </div>
+        `);
+      });
+
+      // Back cover
+      magazine.append(`
+        <div class="hard">
+          <div class="cover-content">
+            <div class="cover-icon">✨</div>
+            <h1>The End</h1>
+            <p>Thank you for reading!</p>
+          </div>
+        </div>
+      `);
+
+      // Initialize Turn.js
+      magazine.turn({
+        width: 1000,
+        height: 650,
+        autoCenter: true,
+        acceleration: true,
+        gradients: true,
+        elevation: 50,
+        when: {
+          turned: function(e, page) {
+            updatePage(page);
+          }
+        }
+      });
+
+      document.getElementById('totalPages').textContent = magazine.turn('pages');
+      updatePage(1);
+    }
+
+    function updatePage(page) {
+      document.getElementById('currentPage').textContent = page;
+      const total = $('#magazine').turn('pages');
+      
+      document.getElementById('prevBtn').disabled = page === 1;
+      document.getElementById('nextBtn').disabled = page === total;
+    }
+
+    function previousPage() {
+      $('#magazine').turn('previous');
+    }
+
+    function nextPage() {
+      $('#magazine').turn('next');
+    }
+
+    function showBook(email) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('header').style.display = 'flex';
+      document.getElementById('bookContainer').style.display = 'flex';
+      document.getElementById('userEmail').textContent = email;
+
+      setTimeout(initializeBook, 100);
+    }
+
+    function onGoogle(res) {
+      const payload = JSON.parse(atob(res.credential.split(".")[1]));
+      currentUser = payload.email;
+      saveSession(payload.email);
+      showBook(payload.email);
+    }
+
+    function initializeGoogleSignIn() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.initialize({
+          client_id: CLIENT_ID,
+          callback: onGoogle
+        });
+
+        const session = getSession();
+        if (session) {
+          showBook(session);
+        } else {
+          google.accounts.id.renderButton(
+            document.getElementById("login"),
+            { theme: "outline", size: "large" }
+          );
+        }
+      } else {
+        setTimeout(initializeGoogleSignIn, 100);
+      }
+    }
+
+    window.onload = initializeGoogleSignIn;
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowRight') nextPage();
+      if (e.key === 'ArrowLeft') previousPage();
+    });
+  </script>
+</body>
+</html>
