@@ -30,6 +30,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      touch-action: pan-y; /* Allow vertical scrolling but prevent default horizontal gestures */
     }
 
     /* Header */
@@ -125,6 +126,7 @@
     .book-wrapper {
       position: relative;
       margin: 1rem auto;
+      touch-action: none; /* Prevent default touch actions on the book */
     }
 
     /* The actual 3D book */
@@ -329,6 +331,27 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* Swipe indicator */
+    .swipe-hint {
+      position: fixed;
+      bottom: 8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(139, 92, 246, 0.9);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      animation: fadeInOut 3s ease-in-out;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      10%, 90% { opacity: 1; }
+    }
+
     /* Responsive */
     @media (max-width: 1100px) {
       .magazine-viewport {
@@ -447,6 +470,14 @@
 
     let currentUser = null;
     let pdfDoc = null;
+
+    // Swipe detection variables
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+    const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+    const VERTICAL_THRESHOLD = 30; // Maximum vertical movement to still count as horizontal swipe
 
     function saveSession(email) {
       localStorage.setItem("kidsoday_pdf_email", email);
@@ -576,6 +607,73 @@
       document.getElementById('bookInfo').style.display = 'block';
       document.getElementById('bookWrapper').style.display = 'block';
       document.getElementById('controls').style.display = 'flex';
+
+      // Add swipe hint
+      showSwipeHint();
+
+      // Initialize swipe listeners
+      initializeSwipeListeners();
+    }
+
+    function showSwipeHint() {
+      const hint = document.createElement('div');
+      hint.className = 'swipe-hint';
+      hint.textContent = '👆 Swipe to flip pages';
+      document.body.appendChild(hint);
+      
+      setTimeout(() => {
+        hint.remove();
+      }, 3000);
+    }
+
+    function initializeSwipeListeners() {
+      const bookWrapper = document.getElementById('bookWrapper');
+      
+      bookWrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
+      bookWrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+      
+      // Also add mouse support for desktop testing
+      bookWrapper.addEventListener('mousedown', handleMouseDown);
+      bookWrapper.addEventListener('mouseup', handleMouseUp);
+    }
+
+    function handleTouchStart(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }
+
+    function handleTouchEnd(e) {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }
+
+    function handleMouseDown(e) {
+      touchStartX = e.screenX;
+      touchStartY = e.screenY;
+    }
+
+    function handleMouseUp(e) {
+      touchEndX = e.screenX;
+      touchEndY = e.screenY;
+      handleSwipe();
+    }
+
+    function handleSwipe() {
+      const horizontalDiff = touchEndX - touchStartX;
+      const verticalDiff = Math.abs(touchEndY - touchStartY);
+      
+      // Check if it's a horizontal swipe (not vertical scroll)
+      if (verticalDiff < VERTICAL_THRESHOLD) {
+        // Swipe left (next page)
+        if (horizontalDiff < -SWIPE_THRESHOLD) {
+          nextPage();
+        }
+        // Swipe right (previous page)
+        else if (horizontalDiff > SWIPE_THRESHOLD) {
+          previousPage();
+        }
+      }
     }
 
     function updatePage(page) {
