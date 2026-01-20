@@ -11,7 +11,10 @@
   <!-- Turn.js Dependencies -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
-   
+  
+  <!-- PDF.js for PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  
   <style>
     * {
       margin: 0;
@@ -102,9 +105,26 @@
       position: relative;
     }
 
+    .book-info {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .book-info h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .book-info p {
+      color: #ecf0f1;
+      font-size: 1.2rem;
+    }
+
     .book-wrapper {
       position: relative;
-      margin: 3rem auto;
+      margin: 1rem auto;
     }
 
     /* The actual 3D book */
@@ -209,63 +229,41 @@
       filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
     }
 
-    /* Inner pages */
-    .page-content {
-      padding: 3rem;
+    /* PDF pages */
+    .pdf-page {
+      width: 100%;
       height: 100%;
-      background: linear-gradient(to right, #fdfcfb 0%, #faf9f7 50%, #f8f7f5 100%);
-      position: relative;
-    }
-
-    /* Page with image */
-    .page-with-image {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      text-align: center;
+      justify-content: center;
+      background: white;
     }
 
-    .page-with-image img {
-      max-width: 90%;
-      max-height: 350px;
-      border-radius: 12px;
-      box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.1);
-      margin-bottom: 1.5rem;
-      border: 5px solid white;
-    }
-
-    .page-with-image h2 {
-      font-size: 2rem;
-      color: #2c3e50;
-      margin-bottom: 1rem;
-      font-weight: 700;
-    }
-
-    .page-with-image p {
-      font-size: 1.3rem;
-      color: #34495e;
-      line-height: 1.8;
-      max-width: 90%;
+    .pdf-page canvas {
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: none;
     }
 
     /* Page number */
     .page-number {
       position: absolute;
-      bottom: 2rem;
-      font-size: 1rem;
+      bottom: 1rem;
+      font-size: 0.9rem;
       color: #95a5a6;
       font-style: italic;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
     }
 
     .page-number.left {
-      left: 3rem;
+      left: 1rem;
     }
 
     .page-number.right {
-      right: 3rem;
+      right: 1rem;
     }
 
     /* Controls */
@@ -310,6 +308,27 @@
       text-align: center;
     }
 
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* Responsive */
     @media (max-width: 1100px) {
       .magazine-viewport {
@@ -337,14 +356,6 @@
       .cover-content h1 {
         font-size: 2rem;
       }
-
-      .page-with-image h2 {
-        font-size: 1.5rem;
-      }
-
-      .page-with-image p {
-        font-size: 1.1rem;
-      }
     }
   </style>
 </head>
@@ -370,7 +381,20 @@
 
   <!-- Book Container -->
   <div class="book-container" id="bookContainer">
-    <div class="book-wrapper">
+    <!-- Book Info -->
+    <div class="book-info" id="bookInfo" style="display:none;">
+      <h1 id="bookTitle">Loading...</h1>
+      <p id="bookPages"></p>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading your storybook...</p>
+    </div>
+
+    <!-- Book Wrapper -->
+    <div class="book-wrapper" id="bookWrapper" style="display:none;">
       <div class="magazine-viewport">
         <div class="shadow"></div>
         <div class="magazine" id="magazine">
@@ -379,12 +403,12 @@
       </div>
     </div>
 
-    <div class="controls">
+    <div class="controls" id="controls" style="display:none;">
       <button class="control-btn" id="prevBtn" onclick="previousPage()">
         ◀ Previous
       </button>
       <div class="page-info">
-        Page <span id="currentPage">1</span> of <span id="totalPages">10</span>
+        Page <span id="currentPage">1</span> of <span id="totalPages">0</span>
       </div>
       <button class="control-btn" id="nextBtn" onclick="nextPage()">
         Next ▶
@@ -396,53 +420,42 @@
     const CLIENT_ID = "656751987892-s5h4b3h7aq6rl63ut7pl6hgm3d2vr46p.apps.googleusercontent.com";
     const SESSION_DAYS = 30;
 
-    // Sample book
-    const book = {
-      title: 'The Rainbow Dragon',
-      pages: [
-        {
-          image: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=800&h=600&fit=crop',
-          title: 'Chapter 1: A Colorful Discovery',
-          text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.'
-        },
-        {
-          image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
-          title: 'Chapter 2: The Hatching',
-          text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!'
-        },
-        {
-          image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop',
-          title: 'Chapter 3: Learning to Fly',
-          text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.'
-        },
-        {
-          image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
-          title: 'Chapter 4: The Color Magic',
-          text: 'Rainbow taught Luna that each color has its own special magic and meaning.'
-        },
-        {
-          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-          title: 'Chapter 5: The Adventure',
-          text: 'They soared over mountains and seas, spreading colorful joy wherever they went.'
-        },
-        {
-          image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop',
-          title: 'Chapter 6: The Lesson',
-          text: 'Rainbow showed Luna that being different makes the world more beautiful.'
-        }
-      ]
+    // ========================================
+    // 📌 CONFIGURE YOUR PDF HERE
+    // ========================================
+    
+    const PDF_CONFIG = {
+      // Option 1: Google Drive
+      // url: 'https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_HERE',
+      
+      // Option 2: Your Server
+      // url: 'https://kidsoday.com/books/storybook.pdf',
+      
+      // Option 3: Dropbox
+      // url: 'https://www.dropbox.com/s/YOUR_FILE_ID/storybook.pdf?dl=1',
+      
+      // For now, using a sample PDF (REPLACE THIS WITH YOUR PDF)
+      url: 'https://cors-anywhere.herokuapp.com/https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      
+      title: 'My Storybook',
+      author: 'Kids O\'Day'
     };
 
+    // ========================================
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
     let currentUser = null;
+    let pdfDoc = null;
 
     function saveSession(email) {
-      localStorage.setItem("kidsoday_flipbook_email", email);
-      localStorage.setItem("kidsoday_flipbook_until", Date.now() + SESSION_DAYS * 86400000);
+      localStorage.setItem("kidsoday_pdf_email", email);
+      localStorage.setItem("kidsoday_pdf_until", Date.now() + SESSION_DAYS * 86400000);
     }
 
     function getSession() {
-      const e = localStorage.getItem("kidsoday_flipbook_email");
-      const u = localStorage.getItem("kidsoday_flipbook_until");
+      const e = localStorage.getItem("kidsoday_pdf_email");
+      const u = localStorage.getItem("kidsoday_pdf_until");
       return (e && u && Date.now() < +u) ? e : null;
     }
 
@@ -451,36 +464,83 @@
       location.reload();
     }
 
-    function initializeBook() {
+    async function loadPDF() {
+      try {
+        document.getElementById('bookTitle').textContent = PDF_CONFIG.title;
+        
+        // Load PDF from URL
+        const loadingTask = pdfjsLib.getDocument(PDF_CONFIG.url);
+        pdfDoc = await loadingTask.promise;
+        
+        await renderPdfBook();
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        document.getElementById('loading').innerHTML = `
+          <div style="color: #e74c3c;">
+            <h2>❌ Error Loading PDF</h2>
+            <p>Could not load the PDF file. Please check:</p>
+            <ul style="text-align: left; display: inline-block; margin-top: 1rem;">
+              <li>PDF URL is correct</li>
+              <li>PDF is publicly accessible</li>
+              <li>File is a valid PDF</li>
+            </ul>
+            <br><br>
+            <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    async function renderPdfBook() {
       const magazine = $('#magazine');
+      magazine.empty();
+
+      const totalPages = pdfDoc.numPages;
+      
+      // Update book info
+      document.getElementById('bookTitle').textContent = PDF_CONFIG.title;
+      document.getElementById('bookPages').textContent = `${totalPages} pages`;
       
       // Front cover
       magazine.append(`
         <div class="hard">
           <div class="cover-content">
-            <div class="cover-icon">🐉</div>
-            <h1>${book.title}</h1>
-            <p>A Magical Adventure</p>
+            <div class="cover-icon">📚</div>
+            <h1>${PDF_CONFIG.title}</h1>
+            <p>${PDF_CONFIG.author}</p>
           </div>
         </div>
       `);
 
-      // Add story pages
-      book.pages.forEach((page, index) => {
-        const pageNum = index + 2;
-        const isLeft = pageNum % 2 === 0;
+      // Render all PDF pages
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
         
-        magazine.append(`
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({
+          canvasContext: context,
+          viewport: viewport
+        }).promise;
+
+        const isLeft = (pageNum + 1) % 2 === 0;
+        
+        const pageDiv = $(`
           <div class="page">
-            <div class="page-content page-with-image">
-              <img src="${page.image}" alt="${page.title}">
-              <h2>${page.title}</h2>
-              <p>${page.text}</p>
-              <div class="page-number ${isLeft ? 'left' : 'right'}">${pageNum}</div>
-            </div>
+            <div class="pdf-page"></div>
+            <div class="page-number ${isLeft ? 'left' : 'right'}">${pageNum}</div>
           </div>
         `);
-      });
+
+        pageDiv.find('.pdf-page').append(canvas);
+        magazine.append(pageDiv);
+      }
 
       // Back cover
       magazine.append(`
@@ -510,6 +570,12 @@
 
       document.getElementById('totalPages').textContent = magazine.turn('pages');
       updatePage(1);
+
+      // Show book
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('bookInfo').style.display = 'block';
+      document.getElementById('bookWrapper').style.display = 'block';
+      document.getElementById('controls').style.display = 'flex';
     }
 
     function updatePage(page) {
@@ -534,7 +600,8 @@
       document.getElementById('bookContainer').style.display = 'flex';
       document.getElementById('userEmail').textContent = email;
 
-      setTimeout(initializeBook, 100);
+      // Load the PDF
+      loadPDF();
     }
 
     function onGoogle(res) {
@@ -564,7 +631,7 @@
         setTimeout(initializeGoogleSignIn, 100);
       }
     }
- 
+
     window.onload = initializeGoogleSignIn;
 
     // Keyboard navigation
