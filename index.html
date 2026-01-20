@@ -19,72 +19,45 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --bg: #1e293b;
-      --card: #ffffff;
-      --text: #1e293b;
-      --text-light: #64748b;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg);
+      font-family: 'Georgia', serif;
+      background: linear-gradient(to bottom, #34495e 0%, #2c3e50 100%);
       color: white;
       overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Header */
     .header {
-      background: rgba(30, 41, 59, 0.95);
+      background: rgba(0, 0, 0, 0.3);
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      backdrop-filter: blur(10px);
     }
 
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       font-size: 1.5rem;
       font-weight: bold;
       color: white;
     }
 
-    .logo-icon {
-      font-size: 2rem;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
     .user-email {
-      color: #94a3b8;
+      color: #ecf0f1;
       font-size: 0.9rem;
     }
 
     .logout-btn {
-      background: var(--primary);
+      background: #e74c3c;
       color: white;
       border: none;
       padding: 0.5rem 1rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.3s;
-    }
-
-    .logout-btn:hover {
-      background: var(--primary-dark);
+      margin-left: 1rem;
     }
 
     /* Login Screen */
@@ -108,934 +81,278 @@
     }
 
     .login-card h1 {
-      color: var(--primary);
+      color: #2c3e50;
       margin-bottom: 1rem;
-      font-size: 2rem;
     }
 
     .login-card p {
-      color: var(--text-light);
+      color: #7f8c8d;
       margin-bottom: 2rem;
     }
 
-    #status {
-      color: var(--text-light);
-      margin-top: 1rem;
-      font-size: 0.9rem;
+    /* Book Container */
+    .book-container {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      perspective: 3000px;
+      position: relative;
     }
 
-    /* Flipbook Container */
-    .flipbook-container {
-      display: none;
-      padding: 2rem;
-      max-width: 1400px;
+    .book-wrapper {
+      position: relative;
+      margin: 3rem auto;
+    }
+
+    /* The actual 3D book */
+    .magazine-viewport {
+      width: 1000px;
+      height: 650px;
+      position: relative;
       margin: 0 auto;
     }
 
-    .book-title {
-      text-align: center;
-      margin-bottom: 2rem;
+    .magazine {
+      width: 100%;
+      height: 100%;
     }
 
-    .book-title h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+    /* Hard shadow for 3D effect */
+    .magazine-viewport .shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.5),
+        0 20px 80px rgba(0, 0, 0, 0.6),
+        0 40px 120px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      z-index: -1;
     }
 
-    .book-title p {
-      color: #94a3b8;
-      font-size: 1.1rem;
+    /* Page styling */
+    .page {
+      width: 500px;
+      height: 650px;
+      background: white;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Flipbook */
-    .flipbook-wrapper {
-      perspective: 2500px;
+    /* Hard cover */
+    .hard {
+      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f59e0b 100%) !important;
+      box-shadow: 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(139, 92, 246, 0.4);
+    }
+
+    .hard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 55%, transparent 100%);
+      animation: glossShine 6s ease-in-out infinite;
+    }
+
+    @keyframes glossShine {
+      0%, 100% { opacity: 0.3; transform: translateX(-100%) skewX(-15deg); }
+      50% { opacity: 0.8; transform: translateX(100%) skewX(-15deg); }
+    }
+
+    /* Cover content */
+    .cover-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      z-index: 2;
+    }
+
+    .cover-content h1 {
+      font-size: 3.5rem;
+      color: white;
+      text-align: center;
+      text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.5),
+        0 4px 20px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .cover-content p {
+      font-size: 1.6rem;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      font-style: italic;
+    }
+
+    .cover-icon {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Inner pages */
+    .page-content {
+      padding: 3rem;
+      height: 100%;
+      background: linear-gradient(to right, #fdfcfb 0%, #faf9f7 50%, #f8f7f5 100%);
+      position: relative;
+    }
+
+    /* Page with image */
+    .page-with-image {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 700px;
-      padding: 40px;
+      text-align: center;
     }
 
-    #flipbook {
-      width: 900px;
-      height: 600px;
-      margin: 0 auto;
-      position: relative;
+    .page-with-image img {
+      max-width: 90%;
+      max-height: 350px;
+      border-radius: 12px;
       box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        0 10px 30px rgba(0, 0, 0, 0.3);
-      transform-style: preserve-3d;
+        0 10px 40px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      border: 5px solid white;
     }
 
-    /* Book 3D spine effect */
-    #flipbook::before {
-      content: '';
-      position: absolute;
-      left: -15px;
-      top: 0;
-      bottom: 0;
-      width: 30px;
-      background: linear-gradient(to right, 
-        #1a1a1a 0%,
-        #2d2d2d 20%,
-        #1a1a1a 50%,
-        #0a0a0a 100%
-      );
-      transform: translateZ(-10px);
-      box-shadow: 
-        inset 2px 0 5px rgba(0, 0, 0, 0.5),
-        -3px 0 10px rgba(0, 0, 0, 0.5);
-      border-radius: 3px 0 0 3px;
-      z-index: -1;
+    .page-with-image h2 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-weight: 700;
     }
 
-    /* Book spine binding lines */
-    #flipbook::after {
-      content: '';
-      position: absolute;
-      left: -15px;
-      top: 10%;
-      bottom: 10%;
-      width: 2px;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.1) 0px,
-        rgba(255, 255, 255, 0.1) 2px,
-        transparent 2px,
-        transparent 15px
-      );
-      transform: translateZ(-5px);
-      z-index: -1;
-    }
-
-    #flipbook .page {
-      width: 450px;
-      height: 600px;
-      background: linear-gradient(to bottom right, #fffef7 0%, #fdfbf3 100%);
-      padding: 0;
-      box-shadow: 
-        inset 0 0 30px rgba(194, 154, 101, 0.15),
-        0 8px 30px rgba(0, 0, 0, 0.3),
-        0 2px 5px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-      border: 2px solid #d4b896;
-      background-image: 
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 2px,
-          rgba(194, 154, 101, 0.03) 2px,
-          rgba(194, 154, 101, 0.03) 4px
-        );
-    }
-
-    /* Page texture overlay */
-    #flipbook .page::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(circle at 20% 50%, transparent 0%, rgba(255, 248, 225, 0.05) 100%),
-        radial-gradient(circle at 80% 50%, transparent 0%, rgba(255, 248, 225, 0.05) 100%);
-      pointer-events: none;
-      opacity: 0.6;
-    }
-
-    /* Book spine shadow */
-    #flipbook .page::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 30px;
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
-      pointer-events: none;
-    }
-
-    /* Right page - remove left shadow, add right shadow */
-    #flipbook .page:nth-child(even)::after {
-      left: auto;
-      right: 0;
-      background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
-    }
-
-    /* Page content wrapper */
-    .page-content {
-      padding: 40px 50px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      z-index: 1;
+    .page-with-image p {
+      font-size: 1.3rem;
+      color: #34495e;
+      line-height: 1.8;
+      max-width: 90%;
     }
 
     /* Page number */
     .page-number {
       position: absolute;
-      bottom: 20px;
-      font-family: 'Georgia', serif;
-      font-size: 14px;
-      color: #8b7355;
+      bottom: 2rem;
+      font-size: 1rem;
+      color: #95a5a6;
       font-style: italic;
     }
 
     .page-number.left {
-      left: 40px;
+      left: 3rem;
     }
 
     .page-number.right {
-      right: 40px;
-    }
-
-    #flipbook .page img {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      max-height: 320px;
-      object-fit: contain;
-      margin: 0 auto 20px;
-      border-radius: 8px;
-      box-shadow: 
-        0 4px 15px rgba(0, 0, 0, 0.2),
-        0 1px 3px rgba(0, 0, 0, 0.1);
-      border: 3px solid white;
-    }
-
-    #flipbook .page h2 {
-      color: #5a4a3a;
-      font-size: 1.6rem;
-      margin: 0 0 15px 0;
-      font-family: 'Georgia', serif;
-      font-weight: 700;
-      text-align: center;
-      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
-      line-height: 1.3;
-    }
-
-    #flipbook .page p {
-      color: #3a3a3a;
-      font-size: 1.15rem;
-      line-height: 1.8;
-      font-family: 'Georgia', serif;
-      text-align: justify;
-      margin: 0;
-      flex-grow: 1;
-      text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.5);
-    }
-
-    /* Cover Page */
-    #flipbook .cover {
-      background: 
-        linear-gradient(135deg, 
-          #667eea 0%, 
-          #764ba2 50%, 
-          #f093fb 100%
-        );
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      overflow: hidden;
-      border: none;
-      box-shadow: 
-        0 15px 50px rgba(0, 0, 0, 0.5),
-        0 5px 20px rgba(0, 0, 0, 0.3),
-        inset 0 0 80px rgba(255, 255, 255, 0.15);
-    }
-
-    /* Glossy hardcover shine effect */
-    #flipbook .cover::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      right: -50%;
-      bottom: -50%;
-      background: 
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-        linear-gradient(135deg, 
-          transparent 0%, 
-          rgba(255, 255, 255, 0.15) 40%, 
-          rgba(255, 255, 255, 0.3) 50%, 
-          rgba(255, 255, 255, 0.15) 60%, 
-          transparent 100%
-        );
-      animation: shine 8s infinite;
-      pointer-events: none;
-    }
-
-    @keyframes shine {
-      0% { transform: rotate(0deg) scale(1); opacity: 0.6; }
-      50% { transform: rotate(5deg) scale(1.1); opacity: 0.8; }
-      100% { transform: rotate(0deg) scale(1); opacity: 0.6; }
-    }
-
-    #flipbook .cover .page-content {
-      z-index: 2;
-      padding: 60px 40px;
-    }
-
-    #flipbook .cover h1 {
-      font-size: 3.2rem;
-      margin-bottom: 20px;
-      color: white;
-      text-shadow: 
-        3px 3px 6px rgba(0, 0, 0, 0.4),
-        0 0 20px rgba(255, 255, 255, 0.3);
-      font-family: 'Georgia', serif;
-      font-weight: 900;
-      line-height: 1.2;
-      letter-spacing: 2px;
-    }
-
-    #flipbook .cover p {
-      font-size: 1.4rem;
-      color: rgba(255, 255, 255, 0.95);
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      font-style: italic;
-      text-align: center;
-    }
-
-    /* Decorative border on cover */
-    #flipbook .cover::after {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      right: 15px;
-      bottom: 15px;
-      border: 3px solid rgba(255, 255, 255, 0.4);
-      border-radius: 8px;
-      pointer-events: none;
-    }
-
-    /* Back Cover */
-    #flipbook .back-cover {
-      background: 
-        linear-gradient(135deg, 
-          #764ba2 0%, 
-          #667eea 50%, 
-          #f093fb 100%
-        );
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      overflow: hidden;
-      border: none;
-      box-shadow: 
-        0 15px 50px rgba(0, 0, 0, 0.5),
-        0 5px 20px rgba(0, 0, 0, 0.3),
-        inset 0 0 80px rgba(255, 255, 255, 0.15);
-    }
-
-    /* Glossy effect on back cover */
-    #flipbook .back-cover::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      right: -50%;
-      bottom: -50%;
-      background: 
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-        linear-gradient(135deg, 
-          transparent 0%, 
-          rgba(255, 255, 255, 0.15) 40%, 
-          rgba(255, 255, 255, 0.3) 50%, 
-          rgba(255, 255, 255, 0.15) 60%, 
-          transparent 100%
-        );
-      animation: shine 8s infinite reverse;
-      pointer-events: none;
-    }
-
-    #flipbook .back-cover .page-content {
-      z-index: 2;
-      padding: 60px 40px;
-    }
-
-    #flipbook .back-cover h1 {
-      font-size: 2.8rem;
-      color: white;
-      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
-      font-family: 'Georgia', serif;
-      margin-bottom: 15px;
-    }
-
-    #flipbook .back-cover p {
-      font-size: 1.3rem;
-      color: rgba(255, 255, 255, 0.95);
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      text-align: center;
-    }
-
-    #flipbook .back-cover::after {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      right: 15px;
-      bottom: 15px;
-      border: 3px solid rgba(255, 255, 255, 0.4);
-      border-radius: 8px;
-      pointer-events: none;
+      right: 3rem;
     }
 
     /* Controls */
     .controls {
+      margin-top: 2rem;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 2rem;
-      margin-top: 2rem;
     }
 
     .control-btn {
-      background: var(--primary);
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
       color: white;
       border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
       transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
     }
 
     .control-btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
     }
 
     .control-btn:disabled {
-      background: #94a3b8;
+      background: #95a5a6;
       cursor: not-allowed;
+      box-shadow: none;
       transform: none;
     }
 
-    .page-indicator {
+    .page-info {
       color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(255,255,255,0.3);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 2rem auto;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Page Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-    }
-
-    @keyframes zoomIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes heartBeat {
-      0%, 100% { transform: scale(1); }
-      10%, 30% { transform: scale(0.9); }
-      20%, 40% { transform: scale(1.1); }
-    }
-
-    .animate-fadeIn { animation: fadeIn 1s ease-in; }
-    .animate-slideInRight { animation: slideInRight 0.8s ease-out; }
-    .animate-bounce { animation: bounce 2s infinite; }
-    .animate-pulse { animation: pulse 2s infinite; }
-    .animate-float { animation: float 3s ease-in-out infinite; }
-    .animate-zoomIn { animation: zoomIn 0.8s ease-out; }
-    .animate-heartBeat { animation: heartBeat 1.5s infinite; }
-
-    /* Interactive Elements */
-    .tap-reveal {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.4s;
-      margin-top: 1rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: 3px dashed rgba(255,255,255,0.6);
-      font-family: 'Georgia', serif;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      text-align: center;
-    }
-
-    .tap-reveal:hover {
-      transform: scale(1.05) rotate(-1deg);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-      border-style: solid;
-    }
-
-    .tap-reveal.revealed {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border-style: solid;
-      animation: heartBeat 0.8s;
-      box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
-    }
-
-    /* Audio Player */
-    .audio-controls {
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .audio-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      cursor: pointer;
       font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .audio-btn:hover {
-      transform: scale(1.15);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
-
-    .audio-btn.playing {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      animation: pulse 1.5s infinite;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-    }
-
-    /* Progress Bar */
-    .progress-container {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.1);
-      z-index: 99;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--success));
-      transition: width 0.3s;
-      box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
-    }
-
-    /* Bookmark */
-    .bookmark-btn {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      border: none;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      opacity: 0.7;
-      box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .bookmark-btn:hover {
-      opacity: 1;
-      transform: scale(1.2) rotate(15deg);
-      box-shadow: 0 5px 15px rgba(245, 158, 11, 0.6);
-    }
-
-    .bookmark-btn.bookmarked {
-      opacity: 1;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      animation: bounce 0.5s;
-      box-shadow: 0 5px 15px rgba(239, 68, 68, 0.6);
-    }
-
-    /* Reading Stats */
-    .reading-stats {
-      text-align: center;
-      padding: 1rem;
-      color: #94a3b8;
-      font-size: 0.9rem;
-    }
-
-    .reading-stats strong {
-      color: white;
-    }
-
-    /* Quiz Modal */
-    .quiz-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .quiz-modal.active {
-      display: flex;
-    }
-
-    .quiz-content {
-      background: white;
-      border-radius: 16px;
-      padding: 3rem;
-      max-width: 600px;
-      width: 100%;
-      color: var(--text);
-    }
-
-    .quiz-content h2 {
-      color: var(--primary);
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-
-    .quiz-question {
-      margin-bottom: 2rem;
-    }
-
-    .quiz-question h3 {
-      margin-bottom: 1rem;
-      color: var(--text);
-    }
-
-    .quiz-option {
-      background: var(--bg);
-      color: white;
-      padding: 1rem;
-      margin-bottom: 0.5rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .quiz-option:hover {
-      background: var(--primary);
-      transform: translateX(10px);
-    }
-
-    .quiz-option.selected {
-      background: var(--primary);
-    }
-
-    .quiz-option.correct {
-      background: var(--success);
-    }
-
-    .quiz-option.incorrect {
-      background: var(--danger);
-    }
-
-    .quiz-submit {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.1rem;
       font-weight: 600;
-      width: 100%;
-      margin-top: 1rem;
-      transition: all 0.3s;
-    }
-
-    .quiz-submit:hover {
-      background: var(--primary-dark);
-    }
-
-    .quiz-result {
+      min-width: 150px;
       text-align: center;
-      padding: 2rem;
-      margin-top: 2rem;
-      background: var(--bg);
-      border-radius: 12px;
-      color: white;
-    }
-
-    .quiz-score {
-      font-size: 3rem;
-      font-weight: bold;
-      color: var(--success);
-      margin: 1rem 0;
-    }
-
-    /* Certificate Modal */
-    .certificate-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .certificate-modal.active {
-      display: flex;
-    }
-
-    .certificate {
-      background: white;
-      padding: 3rem;
-      border-radius: 16px;
-      max-width: 700px;
-      width: 100%;
-      text-align: center;
-      border: 10px solid var(--primary);
-      position: relative;
-    }
-
-    .certificate-header {
-      color: var(--primary);
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      font-weight: bold;
-    }
-
-    .certificate-title {
-      font-size: 1.5rem;
-      color: var(--text);
-      margin-bottom: 2rem;
-    }
-
-    .certificate-name {
-      font-size: 2rem;
-      color: var(--primary);
-      font-weight: bold;
-      margin: 2rem 0;
-      text-decoration: underline;
-      text-decoration-style: double;
-    }
-
-    .certificate-text {
-      color: var(--text);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .certificate-badge {
-      font-size: 4rem;
-      margin: 2rem 0;
-    }
-
-    .certificate-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2rem;
-    }
-
-    .cert-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .cert-btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
     }
 
     /* Responsive */
-    @media (max-width: 1024px) {
-      #flipbook {
-        width: 700px;
-        height: 500px;
+    @media (max-width: 1100px) {
+      .magazine-viewport {
+        width: 800px;
+        height: 520px;
       }
 
-      #flipbook .page {
-        width: 350px;
-        height: 500px;
-        padding: 1.5rem;
+      .page {
+        width: 400px;
+        height: 520px;
       }
     }
 
-    @media (max-width: 768px) {
-      #flipbook {
-        width: 500px;
-        height: 400px;
+    @media (max-width: 900px) {
+      .magazine-viewport {
+        width: 600px;
+        height: 390px;
       }
 
-      #flipbook .page {
-        width: 250px;
-        height: 400px;
-        padding: 1rem;
+      .page {
+        width: 300px;
+        height: 390px;
       }
 
-      #flipbook .page h2 {
-        font-size: 1.3rem;
-      }
-
-      #flipbook .page p {
-        font-size: 0.9rem;
-      }
-
-      #flipbook .cover h1 {
+      .cover-content h1 {
         font-size: 2rem;
       }
 
-      .controls {
-        gap: 1rem;
+      .page-with-image h2 {
+        font-size: 1.5rem;
       }
 
-      .control-btn {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.9rem;
+      .page-with-image p {
+        font-size: 1.1rem;
       }
-    }
-
-    @media (max-width: 540px) {
-      #flipbook {
-        width: 90vw;
-        height: 60vh;
-      }
-
-      #flipbook .page {
-        width: 45vw;
-        height: 60vh;
-        padding: 0.75rem;
-      }
-
-      #flipbook .page img {
-        max-height: 200px;
-      }
-
-      .book-title h1 {
-        font-size: 1.8rem;
-      }
-    }
-
-    /* Access Denied */
-    .access-denied {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-
-    .access-denied-card {
-      background: white;
-      padding: 3rem;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      text-align: center;
-      max-width: 500px;
-    }
-
-    .access-denied-card h1 {
-      color: #ef4444;
-      margin-bottom: 1rem;
-      font-size: 2rem;
-    }
-
-    .access-denied-card p {
-      color: var(--text-light);
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .access-denied-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
   <!-- Header -->
   <div class="header" id="header" style="display:none;">
-    <div class="logo">
-      <span class="logo-icon">🎓</span>
-      <span>Kids O'Day</span>
-    </div>
-    <div class="user-info">
+    <div class="logo">📚 Kids O'Day Storybook</div>
+    <div>
       <span class="user-email" id="userEmail"></span>
       <button class="logout-btn" onclick="signOut()">Sign Out</button>
     </div>
@@ -1047,41 +364,18 @@
       <h1>📚 Storybook Reader</h1>
       <p>Sign in to access your magical stories</p>
       <div id="login"></div>
-      <div id="status">Please sign in to continue</div>
+      <div id="status" style="margin-top: 1rem; color: #7f8c8d;">Please sign in to continue</div>
     </div>
   </div>
 
-  <!-- Access Denied Screen -->
-  <div class="access-denied" id="accessDenied">
-    <div class="access-denied-card">
-      <div class="access-denied-icon">🔒</div>
-      <h1>Access Denied</h1>
-      <p>Sorry, you don't have access to this storybook. Please make sure you're enrolled in this course or contact support.</p>
-      <button class="logout-btn" onclick="signOut()">Sign Out</button>
-    </div>
-  </div>
-
-  <!-- Flipbook Container -->
-  <div class="flipbook-container" id="flipbookContainer">
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-    </div>
-
-    <div class="book-title">
-      <h1 id="bookTitle">The Rainbow Dragon</h1>
-      <p id="bookAuthor">A Magical Adventure Story</p>
-    </div>
-
-    <!-- Reading Stats -->
-    <div class="reading-stats">
-      <span>📖 Estimated reading time: <strong id="readingTime">15 minutes</strong></span>
-      <span style="margin-left: 2rem;">⏱️ Time spent: <strong id="timeSpent">0:00</strong></span>
-    </div>
-
-    <div class="flipbook-wrapper">
-      <div id="flipbook">
-        <!-- Pages will be loaded here by JavaScript -->
+  <!-- Book Container -->
+  <div class="book-container" id="bookContainer">
+    <div class="book-wrapper">
+      <div class="magazine-viewport">
+        <div class="shadow"></div>
+        <div class="magazine" id="magazine">
+          <!-- Pages will be added by JavaScript -->
+        </div>
       </div>
     </div>
 
@@ -1089,7 +383,7 @@
       <button class="control-btn" id="prevBtn" onclick="previousPage()">
         ◀ Previous
       </button>
-      <div class="page-indicator">
+      <div class="page-info">
         Page <span id="currentPage">1</span> of <span id="totalPages">10</span>
       </div>
       <button class="control-btn" id="nextBtn" onclick="nextPage()">
@@ -1098,186 +392,58 @@
     </div>
   </div>
 
-  <!-- Quiz Modal -->
-  <div class="quiz-modal" id="quizModal">
-    <div class="quiz-content">
-      <h2>📝 Story Quiz</h2>
-      <div id="quizQuestions"></div>
-      <button class="quiz-submit" id="submitQuiz" onclick="submitQuiz()">Submit Quiz</button>
-      <div id="quizResult" style="display:none;"></div>
-    </div>
-  </div>
-
-  <!-- Certificate Modal -->
-  <div class="certificate-modal" id="certificateModal">
-    <div class="certificate">
-      <div class="certificate-header">🏆 Certificate of Completion 🏆</div>
-      <div class="certificate-title">This certifies that</div>
-      <div class="certificate-name" id="certificateName">Student Name</div>
-      <div class="certificate-text">
-        has successfully completed reading<br>
-        <strong id="certificateBook">The Rainbow Dragon</strong><br>
-        and passed the comprehension quiz with flying colors!
-      </div>
-      <div class="certificate-badge">🌟✨🎉</div>
-      <div style="color: var(--text-light); font-size: 0.9rem;">
-        Date: <span id="certificateDate"></span>
-      </div>
-      <div class="certificate-actions">
-        <button class="cert-btn" onclick="downloadCertificate()">📥 Download</button>
-        <button class="cert-btn" onclick="closeCertificate()">Close</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const CLIENT_ID = "656751987892-s5h4b3h7aq6rl63ut7pl6hgm3d2vr46p.apps.googleusercontent.com";
-    const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"; // Replace with your deployed script URL
     const SESSION_DAYS = 30;
 
-    // Get book ID from URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookId = urlParams.get('book') || 'rainbow-dragon';
-
-    let currentUser = null;
-    let flipbookInitialized = false;
-    let currentAudio = null;
-    let startTime = null;
-    let readingTimer = null;
-    let bookmarks = [];
-    let userAnswers = [];
-
-    // Sample book data (in production, this would come from your backend)
-    const books = {
-      'rainbow-dragon': {
-        title: 'The Rainbow Dragon',
-        author: 'A Magical Adventure Story',
-        estimatedReadTime: 15, // minutes
-        quiz: {
-          questions: [
-            {
-              question: "What did Luna find in her garden?",
-              options: ["A flower", "A mysterious egg", "A treasure", "A book"],
-              correct: 1
-            },
-            {
-              question: "What was special about the dragon?",
-              options: ["It was invisible", "It had rainbow scales", "It could talk", "It was tiny"],
-              correct: 1
-            },
-            {
-              question: "What did Rainbow teach Luna?",
-              options: ["How to fly", "Each color has special magic", "How to draw", "Math skills"],
-              correct: 1
-            }
-          ]
+    // Sample book
+    const book = {
+      title: 'The Rainbow Dragon',
+      pages: [
+        {
+          image: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=800&h=600&fit=crop',
+          title: 'Chapter 1: A Colorful Discovery',
+          text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.'
         },
-        pages: [
-          {
-            type: 'cover',
-            title: 'The Rainbow Dragon',
-            subtitle: 'By Kids O\'Day',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' // Sample audio
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=400&h=300&fit=crop',
-            title: 'Chapter 1: A Colorful Discovery',
-            text: 'Luna found a mysterious egg in her garden. It shimmered with all the colors of the rainbow.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-            animations: ['fadeIn', 'bounce'],
-            interactive: {
-              type: 'tap-reveal',
-              hidden: '🥚 Tap the egg to see it shimmer!',
-              revealed: '✨ The egg glows with rainbow colors! ✨'
-            }
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
-            title: 'Chapter 2: The Hatching',
-            text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-            animations: ['slideInRight'],
-            interactive: {
-              type: 'tap-reveal',
-              hidden: '🥚 Tap to see the dragon hatch!',
-              revealed: '🐉 A beautiful rainbow dragon appears!'
-            }
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=300&fit=crop',
-            title: 'Chapter 3: Learning to Fly',
-            text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-            animations: ['float']
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400&h=300&fit=crop',
-            title: 'Chapter 4: The Color Magic',
-            text: 'Rainbow taught Luna that each color has its own special magic and meaning.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-            animations: ['pulse'],
-            interactive: {
-              type: 'tap-reveal',
-              hidden: '🌈 Tap to discover the color magic!',
-              revealed: '✨ Red=Love, Blue=Peace, Yellow=Joy! ✨'
-            }
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
-            title: 'Chapter 5: The Adventure',
-            text: 'They soared over mountains and seas, spreading colorful joy wherever they went.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-            animations: ['zoomIn']
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=300&fit=crop',
-            title: 'Chapter 6: The Lesson',
-            text: 'Rainbow showed Luna that being different makes the world more beautiful.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-            animations: ['fadeIn']
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop',
-            title: 'Chapter 7: Forever Friends',
-            text: 'Luna and Rainbow became the best of friends, proving that friendship knows no bounds.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-            animations: ['heartBeat']
-          },
-          {
-            image: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop',
-            title: 'The End',
-            text: 'And they lived happily ever after, sharing their colorful adventures with everyone.',
-            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
-            animations: ['fadeIn']
-          },
-          {
-            type: 'back-cover',
-            title: 'The End',
-            subtitle: 'Thank you for reading! 🌈✨'
-          }
-        ]
-      }
+        {
+          image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop',
+          title: 'Chapter 2: The Hatching',
+          text: 'One morning, the egg began to crack. Out came a tiny dragon with rainbow scales!'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop',
+          title: 'Chapter 3: Learning to Fly',
+          text: 'Luna named him Rainbow. Together, they practiced flying through the clouds.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&h=600&fit=crop',
+          title: 'Chapter 4: The Color Magic',
+          text: 'Rainbow taught Luna that each color has its own special magic and meaning.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+          title: 'Chapter 5: The Adventure',
+          text: 'They soared over mountains and seas, spreading colorful joy wherever they went.'
+        },
+        {
+          image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop',
+          title: 'Chapter 6: The Lesson',
+          text: 'Rainbow showed Luna that being different makes the world more beautiful.'
+        }
+      ]
     };
 
-    /* ================= SESSION MANAGEMENT ================= */
-    function saveSession(email, firstName, lastName) {
+    let currentUser = null;
+
+    function saveSession(email) {
       localStorage.setItem("kidsoday_flipbook_email", email);
-      localStorage.setItem("kidsoday_flipbook_firstName", firstName || "");
-      localStorage.setItem("kidsoday_flipbook_lastName", lastName || "");
       localStorage.setItem("kidsoday_flipbook_until", Date.now() + SESSION_DAYS * 86400000);
     }
 
     function getSession() {
       const e = localStorage.getItem("kidsoday_flipbook_email");
       const u = localStorage.getItem("kidsoday_flipbook_until");
-      if (e && u && Date.now() < +u) {
-        return {
-          email: e,
-          firstName: localStorage.getItem("kidsoday_flipbook_firstName") || "",
-          lastName: localStorage.getItem("kidsoday_flipbook_lastName") || ""
-        };
-      }
-      return null;
+      return (e && u && Date.now() < +u) ? e : null;
     }
 
     function signOut() {
@@ -1285,178 +451,110 @@
       location.reload();
     }
 
-    /* ================= ACCESS VERIFICATION ================= */
-    function verifyAccess(email) {
-      // In production, check against your Google Sheets Database
-      // For now, we'll allow access for demonstration
-      // You can integrate with your existing API_URL
+    function initializeBook() {
+      const magazine = $('#magazine');
       
-      const url = `${API_URL}?action=checkFlipbookAccess&email=${encodeURIComponent(email)}&bookId=${encodeURIComponent(bookId)}`;
-      
-      return fetch(url)
-        .then(r => r.json())
-        .then(data => {
-          return data.hasAccess === true;
-        })
-        .catch(err => {
-          console.error("Access verification error:", err);
-          // For demo purposes, allow access if API fails
-          // In production, you should deny access on error
-          return true;
-        });
-    }
+      // Front cover
+      magazine.append(`
+        <div class="hard">
+          <div class="cover-content">
+            <div class="cover-icon">🐉</div>
+            <h1>${book.title}</h1>
+            <p>A Magical Adventure</p>
+          </div>
+        </div>
+      `);
 
-    /* ================= FLIPBOOK INITIALIZATION ================= */
-    function initializeFlipbook() {
-      if (flipbookInitialized) return;
-
-      const book = books[bookId];
-      if (!book) {
-        alert('Book not found!');
-        return;
-      }
-
-      // Update book info
-      document.getElementById('bookTitle').textContent = book.title;
-      document.getElementById('bookAuthor').textContent = book.author;
-      document.getElementById('totalPages').textContent = book.pages.length;
-
-      // Create pages
-      const flipbook = $('#flipbook');
-      flipbook.empty();
-
+      // Add story pages
       book.pages.forEach((page, index) => {
-        let pageContent = '';
+        const pageNum = index + 2;
+        const isLeft = pageNum % 2 === 0;
         
-        if (page.type === 'cover') {
-          pageContent = `
-            <div class="page cover">
-              <h1>${page.title}</h1>
-              <p>${page.subtitle}</p>
-            </div>
-          `;
-        } else if (page.type === 'back-cover') {
-          pageContent = `
-            <div class="page back-cover">
-              <h1>${page.title}</h1>
-              <p>${page.subtitle}</p>
-            </div>
-          `;
-        } else {
-          pageContent = `
-            <div class="page">
-              ${page.image ? `<img src="${page.image}" alt="${page.title}">` : ''}
+        magazine.append(`
+          <div class="page">
+            <div class="page-content page-with-image">
+              <img src="${page.image}" alt="${page.title}">
               <h2>${page.title}</h2>
               <p>${page.text}</p>
+              <div class="page-number ${isLeft ? 'left' : 'right'}">${pageNum}</div>
             </div>
-          `;
-        }
-
-        flipbook.append(pageContent);
+          </div>
+        `);
       });
+
+      // Back cover
+      magazine.append(`
+        <div class="hard">
+          <div class="cover-content">
+            <div class="cover-icon">✨</div>
+            <h1>The End</h1>
+            <p>Thank you for reading!</p>
+          </div>
+        </div>
+      `);
 
       // Initialize Turn.js
-      flipbook.turn({
-        width: 900,
-        height: 600,
+      magazine.turn({
+        width: 1000,
+        height: 650,
         autoCenter: true,
-        duration: 1000,
-        gradients: true,
         acceleration: true,
-        elevation: 50
+        gradients: true,
+        elevation: 50,
+        when: {
+          turned: function(e, page) {
+            updatePage(page);
+          }
+        }
       });
 
-      // Update page indicator on turn
-      flipbook.bind('turned', function(event, page, view) {
-        updatePageIndicator(page);
-      });
-
-      flipbookInitialized = true;
-      updatePageIndicator(1);
+      document.getElementById('totalPages').textContent = magazine.turn('pages');
+      updatePage(1);
     }
 
-    /* ================= PAGE NAVIGATION ================= */
-    function nextPage() {
-      $('#flipbook').turn('next');
+    function updatePage(page) {
+      document.getElementById('currentPage').textContent = page;
+      const total = $('#magazine').turn('pages');
+      
+      document.getElementById('prevBtn').disabled = page === 1;
+      document.getElementById('nextBtn').disabled = page === total;
     }
 
     function previousPage() {
-      $('#flipbook').turn('previous');
+      $('#magazine').turn('previous');
     }
 
-    function updatePageIndicator(page) {
-      document.getElementById('currentPage').textContent = page;
-      
-      // Update button states
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-      const totalPages = books[bookId].pages.length;
-      
-      prevBtn.disabled = page === 1;
-      nextBtn.disabled = page === totalPages;
+    function nextPage() {
+      $('#magazine').turn('next');
     }
 
-    /* ================= GOOGLE SIGN-IN ================= */
-    function onGoogle(res) {
-      const payload = JSON.parse(atob(res.credential.split(".")[1]));
-      const email = payload.email;
-      const firstName = payload.given_name || "";
-      const lastName = payload.family_name || "";
-
-      currentUser = { email, firstName, lastName };
-      saveSession(email, firstName, lastName);
-
-      document.getElementById('status').textContent = 'Verifying access...';
-
-      verifyAccess(email).then(hasAccess => {
-        if (hasAccess) {
-          showFlipbook(email);
-        } else {
-          showAccessDenied();
-        }
-      });
-    }
-
-    function showFlipbook(email) {
+    function showBook(email) {
       document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('accessDenied').style.display = 'none';
       document.getElementById('header').style.display = 'flex';
-      document.getElementById('flipbookContainer').style.display = 'block';
+      document.getElementById('bookContainer').style.display = 'flex';
       document.getElementById('userEmail').textContent = email;
 
-      // Initialize flipbook after DOM is visible
-      setTimeout(() => {
-        initializeFlipbook();
-      }, 100);
+      setTimeout(initializeBook, 100);
     }
 
-    function showAccessDenied() {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('accessDenied').style.display = 'flex';
+    function onGoogle(res) {
+      const payload = JSON.parse(atob(res.credential.split(".")[1]));
+      currentUser = payload.email;
+      saveSession(payload.email);
+      showBook(payload.email);
     }
 
     function initializeGoogleSignIn() {
-      const sessionData = getSession();
-
       if (typeof google !== 'undefined' && google.accounts) {
         google.accounts.id.initialize({
           client_id: CLIENT_ID,
           callback: onGoogle
         });
 
-        if (sessionData) {
-          currentUser = sessionData;
-          document.getElementById('status').textContent = 'Verifying access...';
-          
-          verifyAccess(sessionData.email).then(hasAccess => {
-            if (hasAccess) {
-              showFlipbook(sessionData.email);
-            } else {
-              showAccessDenied();
-            }
-          });
+        const session = getSession();
+        if (session) {
+          showBook(session);
         } else {
-          document.getElementById('status').textContent = 'Sign in to continue';
           google.accounts.id.renderButton(
             document.getElementById("login"),
             { theme: "outline", size: "large" }
@@ -1467,392 +565,13 @@
       }
     }
 
-    // Initialize on load
     window.onload = initializeGoogleSignIn;
 
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
-      if (!flipbookInitialized) return;
-      
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        nextPage();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        previousPage();
-      }
+      if (e.key === 'ArrowRight') nextPage();
+      if (e.key === 'ArrowLeft') previousPage();
     });
-
-    /* ================= ENHANCED FEATURES ================= */
-    
-    // Audio Narration
-    function playAudio(audioUrl) {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-      }
-      
-      if (audioUrl) {
-        currentAudio = new Audio(audioUrl);
-        currentAudio.play();
-      }
-    }
-
-    function stopAudio() {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-      }
-    }
-
-    //Progress Tracking
-    function updateProgress(page) {
-      const book = books[bookId];
-      const progress = (page / book.pages.length) * 100;
-      document.getElementById('progressBar').style.width = progress + '%';
-      
-      // Check if reached end
-      if (page === book.pages.length && !book.quizCompleted) {
-        // Show quiz after finishing the book
-        setTimeout(() => {
-          showQuiz();
-        }, 1000);
-      }
-    }
-
-    // Reading Time Tracker
-    function startReadingTimer() {
-      startTime = Date.now();
-      readingTimer = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
-        document.getElementById('timeSpent').textContent = 
-          `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }, 1000);
-    }
-
-    function stopReadingTimer() {
-      if (readingTimer) {
-        clearInterval(readingTimer);
-      }
-    }
-
-    // Bookmarks
-    function toggleBookmark(page) {
-      const index = bookmarks.indexOf(page);
-      if (index > -1) {
-        bookmarks.splice(index, 1);
-      } else {
-        bookmarks.push(page);
-      }
-      saveBookmarks();
-    }
-
-    function saveBookmarks() {
-      localStorage.setItem(`bookmarks_${bookId}`, JSON.stringify(bookmarks));
-    }
-
-    function loadBookmarks() {
-      const saved = localStorage.getItem(`bookmarks_${bookId}`);
-      if (saved) {
-        bookmarks = JSON.parse(saved);
-      }
-    }
-
-    // Quiz System
-    function showQuiz() {
-      const book = books[bookId];
-      if (!book.quiz) return;
-      
-      const quizContainer = document.getElementById('quizQuestions');
-      quizContainer.innerHTML = '';
-      userAnswers = [];
-      
-      book.quiz.questions.forEach((q, qIndex) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'quiz-question';
-        questionDiv.innerHTML = `
-          <h3>${qIndex + 1}. ${q.question}</h3>
-          ${q.options.map((option, oIndex) => `
-            <div class="quiz-option" data-question="${qIndex}" data-option="${oIndex}">
-              ${option}
-            </div>
-          `).join('')}
-        `;
-        quizContainer.appendChild(questionDiv);
-      });
-      
-      // Add click handlers
-      document.querySelectorAll('.quiz-option').forEach(option => {
-        option.addEventListener('click', function() {
-          const question = parseInt(this.dataset.question);
-          const optionIndex = parseInt(this.dataset.option);
-          
-          // Remove previous selection
-          document.querySelectorAll(`[data-question="${question}"]`).forEach(opt => {
-            opt.classList.remove('selected');
-          });
-          
-          // Mark as selected
-          this.classList.add('selected');
-          userAnswers[question] = optionIndex;
-        });
-      });
-      
-      document.getElementById('quizModal').classList.add('active');
-      document.getElementById('quizResult').style.display = 'none';
-    }
-
-    function submitQuiz() {
-      const book = books[bookId];
-      if (!book.quiz) return;
-      
-      let correct = 0;
-      book.quiz.questions.forEach((q, index) => {
-        if (userAnswers[index] === q.correct) {
-          correct++;
-          document.querySelectorAll(`[data-question="${index}"]`)[userAnswers[index]].classList.add('correct');
-        } else {
-          if (userAnswers[index] !== undefined) {
-            document.querySelectorAll(`[data-question="${index}"]`)[userAnswers[index]].classList.add('incorrect');
-          }
-          document.querySelectorAll(`[data-question="${index}"]`)[q.correct].classList.add('correct');
-        }
-      });
-      
-      const percentage = Math.round((correct / book.quiz.questions.length) * 100);
-      const passed = percentage >= 70;
-      
-      const resultDiv = document.getElementById('quizResult');
-      resultDiv.innerHTML = `
-        <div class="quiz-score">${percentage}%</div>
-        <h3>${passed ? '🎉 Congratulations!' : '📚 Keep Learning!'}</h3>
-        <p>You got ${correct} out of ${book.quiz.questions.length} questions correct!</p>
-        ${passed ? '<button class="quiz-submit" onclick="showCertificate()">Get Your Certificate! 🏆</button>' : 
-                    '<button class="quiz-submit" onclick="closeQuiz(); setTimeout(showQuiz, 500);">Try Again</button>'}
-      `;
-      resultDiv.style.display = 'block';
-      
-      if (passed) {
-        book.quizCompleted = true;
-        saveProgress(bookId, percentage);
-      }
-    }
-
-    function closeQuiz() {
-      document.getElementById('quizModal').classList.remove('active');
-    }
-
-    // Certificate
-    function showCertificate() {
-      closeQuiz();
-      const book = books[bookId];
-      const userName = currentUser ? `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.email : 'Student';
-      
-      document.getElementById('certificateName').textContent = userName;
-      document.getElementById('certificateBook').textContent = book.title;
-      document.getElementById('certificateDate').textContent = new Date().toLocaleDateString();
-      
-      document.getElementById('certificateModal').classList.add('active');
-      
-      // Save certificate data
-      saveCertificate(bookId, userName);
-    }
-
-    function closeCertificate() {
-      document.getElementById('certificateModal').classList.remove('active');
-    }
-
-    function downloadCertificate() {
-      // In a real implementation, you would use html2canvas or similar to generate an image/PDF
-      alert('Certificate download feature coming soon! For now, take a screenshot of your certificate.');
-    }
-
-    // Save Progress
-    function saveProgress(bookId, quizScore) {
-      const progress = {
-        bookId: bookId,
-        completed: true,
-        quizScore: quizScore,
-        completedDate: new Date().toISOString(),
-        timeSpent: document.getElementById('timeSpent').textContent
-      };
-      
-      localStorage.setItem(`progress_${bookId}`, JSON.stringify(progress));
-      
-      // Optionally send to Google Sheets
-      if (currentUser) {
-        sendProgressToSheet(progress);
-      }
-    }
-
-    function saveCertificate(bookId, userName) {
-      const certificate = {
-        bookId: bookId,
-        userName: userName,
-        email: currentUser ? currentUser.email : '',
-        issuedDate: new Date().toISOString()
-      };
-      
-      localStorage.setItem(`certificate_${bookId}`, JSON.stringify(certificate));
-      
-      // Send to Google Sheets
-      if (currentUser) {
-        sendCertificateToSheet(certificate);
-      }
-    }
-
-    function sendProgressToSheet(progress) {
-      fetch(API_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'saveProgress',
-          email: currentUser.email,
-          ...progress
-        })
-      }).catch(err => console.error('Error saving progress:', err));
-    }
-
-    function sendCertificateToSheet(certificate) {
-      fetch(API_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'saveCertificate',
-          ...certificate
-        })
-      }).catch(err => console.error('Error saving certificate:', err));
-    }
-
-    // Update initializeFlipbook to include enhancements
-    const originalInitializeFlipbook = initializeFlipbook;
-    initializeFlipbook = function() {
-      const book = books[bookId];
-      if (!book) {
-        alert('Book not found!');
-        return;
-      }
-
-      // Update book info
-      document.getElementById('bookTitle').textContent = book.title;
-      document.getElementById('bookAuthor').textContent = book.author;
-      document.getElementById('totalPages').textContent = book.pages.length;
-      document.getElementById('readingTime').textContent = (book.estimatedReadTime || 15) + ' minutes';
-
-      // Load bookmarks
-      loadBookmarks();
-
-      // Start reading timer
-      startReadingTimer();
-
-      // Create pages with enhancements
-      const flipbook = $('#flipbook');
-      flipbook.empty();
-
-      book.pages.forEach((page, index) => {
-        let pageContent = '';
-        const pageNumber = index + 1;
-        const isLeftPage = pageNumber % 2 === 0;
-        
-        if (page.type === 'cover') {
-          pageContent = `
-            <div class="page cover">
-              <div class="page-content">
-                <div style="margin-bottom: 40px; font-size: 4rem;">📚</div>
-                <h1>${page.title}</h1>
-                <p>${page.subtitle}</p>
-                ${page.audio ? `
-                  <div class="audio-controls" style="margin-top: 30px;">
-                    <button class="audio-btn" onclick="playAudio('${page.audio}'); event.stopPropagation();">🔊</button>
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        } else if (page.type === 'back-cover') {
-          pageContent = `
-            <div class="page back-cover">
-              <div class="page-content">
-                <div style="margin-bottom: 30px; font-size: 3.5rem;">🌟</div>
-                <h1>${page.title}</h1>
-                <p>${page.subtitle}</p>
-                <div style="margin-top: 40px; font-size: 2.5rem;">✨🎉✨</div>
-              </div>
-            </div>
-          `;
-        } else {
-          const animationClass = page.animations ? page.animations.map(a => `animate-${a}`).join(' ') : '';
-          pageContent = `
-            <div class="page">
-              <div class="page-content">
-                <button class="bookmark-btn ${bookmarks.includes(pageNumber) ? 'bookmarked' : ''}" 
-                        onclick="toggleBookmark(${pageNumber}); this.classList.toggle('bookmarked'); event.stopPropagation();"
-                        style="position: absolute; top: 15px; right: 15px; z-index: 10;">
-                  ${bookmarks.includes(pageNumber) ? '🔖' : '📌'}
-                </button>
-                
-                ${page.image ? `
-                  <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="${page.image}" alt="${page.title}" class="${animationClass}">
-                  </div>
-                ` : ''}
-                
-                <h2>${page.title}</h2>
-                
-                <p>${page.text}</p>
-                
-                ${page.interactive ? `
-                  <div class="tap-reveal" 
-                       style="margin-top: 15px; font-size: 0.95rem; padding: 12px 20px;"
-                       onclick="this.classList.toggle('revealed'); 
-                                this.textContent = this.classList.contains('revealed') ? '${page.interactive.revealed}' : '${page.interactive.hidden}'; 
-                                event.stopPropagation();">
-                    ${page.interactive.hidden}
-                  </div>
-                ` : ''}
-                
-                ${page.audio ? `
-                  <div class="audio-controls" style="margin-top: 15px;">
-                    <button class="audio-btn" 
-                            onclick="playAudio('${page.audio}'); this.classList.add('playing'); event.stopPropagation();">▶️</button>
-                    <button class="audio-btn" 
-                            onclick="stopAudio(); document.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('playing')); event.stopPropagation();">⏹️</button>
-                  </div>
-                ` : ''}
-                
-                <div class="page-number ${isLeftPage ? 'left' : 'right'}">${pageNumber}</div>
-              </div>
-            </div>
-          `;
-        }
-
-        flipbook.append(pageContent);
-      });
-
-      // Initialize Turn.js
-      flipbook.turn({
-        width: 900,
-        height: 600,
-        autoCenter: true,
-        duration: 1000,
-        gradients: true,
-        acceleration: true,
-        elevation: 50
-      });
-
-      // Update page indicator and progress on turn
-      flipbook.bind('turned', function(event, page, view) {
-        updatePageIndicator(page);
-        updateProgress(page);
-        stopAudio(); // Stop audio when turning page
-      });
-
-      flipbookInitialized = true;
-      updatePageIndicator(1);
-      updateProgress(1);
-    };
   </script>
 </body>
 </html>
